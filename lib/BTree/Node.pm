@@ -1,10 +1,6 @@
-package BTree;
+package BTree::Node;
 use strict;
 use warnings;
-
-our $VERSION = '0.01';
-
-use BTree::Node;
 
 sub new {
     my ($class, $arg_ref) = @_;
