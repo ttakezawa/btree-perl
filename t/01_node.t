@@ -6,7 +6,7 @@ use Test::More tests => 6;
 use BTree::Node;
 
 my $order = 2; # means `2-3-4 tree`
-my $node = BTree::Node->new({-t => $order});
+my $node = BTree::Node->new({-t => $order, -is_leaf => 1});
 isa_ok($node, "BTree::Node");
 
 is($node->{-t}, $order);

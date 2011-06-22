@@ -3,11 +3,10 @@ use strict;
 use warnings;
 use lib 'lib';
 use BTree;
-my $btree = BTree->new();
+my $btree = BTree->new({-t => 2});
+$btree->insert(5);
+$btree->insert(8);
+$btree->insert(1);
+$btree->insert(7);
 
-use BTree::Node;
-my $node = BTree::Node->new({-t => 2});
-$node->insert(5);
-$node->insert(8);
-$node->insert(1);
-$node->insert(7);
+print $btree->keys_to_json(), "\n";
