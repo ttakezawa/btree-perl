@@ -31,18 +31,10 @@ sub _is_full {
 	return $self->length() == 2 * $self->{-t} - 1;
 }
 
-sub insert {
-	my ($self, $key) = @_;
-	if ($self->_is_full()) {
-		confess "TODO";
-	} else {
-		$self->_insert_nonfull($key);
-	}
-}
-
 sub _insert_nonfull {
 	my ($self, $key) = @_;
 	if ($self->is_leaf()) {
+		# $selfが葉のときは適切な位置にキーとして挿入するだけ
 		my $i = List::Util::first { $key < $self->{-keys}[$_] } (0..scalar(@{$self->{-keys}})-1);
 		if (defined $i) {
 			splice(@{$self->{-keys}}, $i, 0, $key);
@@ -57,14 +49,40 @@ sub _insert_nonfull {
 		# }
 		# $self->{-keys}[$i+1] = $key;
 	} else {
-		confess "TODO";
+		my $i = List::Util::first { $key < $self->{-keys}[$_] } (0..scalar(@{$self->{-keys}})-1);
+		$i = scalar(@{$self->{-keys}}) unless (defined $i);
+
+		if ($self->{-children}[$i]->_is_full()) {
+			$self->split_child($i);
+			if ($key > $self->{-keys}[$i]) {
+				$i++;
+			}
+		}
+		$self->{-children}[$i]->_insert_nonfull($key);
 	}
 }
 
+# $self のi番目の子:$yを分割する
+# $yの中央のキーが、$selfのi番目に挿入され、$yと$zで分割される
 sub split_child {
 	my ($self, $i) = @_;
 	my $y = $self->{-children}[$i];
-	confess "TODO";
+	my $t = $self->{-t};
+
+	# $yからキーと子を分割して新しい節点$zを作成
+	my $z = BTree::Node->new({-t => $t});
+	$z->{-is_leaf} = $y->is_leaf();
+	@{$z->{-keys}} = splice(@{$y->{-keys}}, $t);
+	if (!$y->is_leaf()) {
+		@{$z->{-children}} = splice(@{$y->{-children}}, $t);
+	}
+
+	# $zを$selfのi番目の後ろに子として挿入
+	splice(@{$self->{-children}}, $i+1, 0, ($z));
+	
+	# $yの中央にあったキーを、$selfのi番目に挿入
+	my $key = pop @{$y->{-keys}};
+	splice(@{$self->{-keys}}, $i, 0, ($key));
 }
 
 1;

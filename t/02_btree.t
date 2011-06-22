@@ -2,8 +2,36 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More tests => 10;
 use BTree;
 
-my $node = BTree->new(); # {-t => 5};
-isa_ok($node, "BTree");
+my $btree = BTree->new({-t => 2}); # means `2-3-4 tree`
+isa_ok($btree, "BTree");
+
+# test cnt: 1
+
+
+my $keys = $btree->{-root}{-keys};
+$btree->insert(5);
+is_deeply($keys, [5],       "insert 1st: 5");
+$btree->insert(8);
+is_deeply($keys, [5,8],     "insert 2nd: 8");
+$btree->insert(1);
+is_deeply($keys, [1,5,8],   "insert 3rd: 1");
+
+# test cnt: 3
+
+
+$btree->insert(7); # splits the root node
+is_deeply($btree->{-root}{-keys}, [5]);
+is_deeply(scalar(@{$btree->{-root}{-children}}), 2);
+
+my $left_child = $btree->{-root}{-children}[0];
+isa_ok($left_child, "BTree::Node");
+my $right_child = $btree->{-root}{-children}[1];
+isa_ok($right_child, "BTree::Node");
+
+is_deeply($left_child->{-keys}, [1]);
+is_deeply($right_child->{-keys}, [7,8]);
+
+# test cnt: 6
