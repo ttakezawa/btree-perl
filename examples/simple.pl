@@ -10,3 +10,7 @@ $btree->insert(1);
 $btree->insert(7);
 
 print $btree->keys_to_json(), "\n";
+
+use Data::Dumper;
+print Dumper($btree->search(1)), "\n";
+print Dumper($btree->search(3)), "\n";

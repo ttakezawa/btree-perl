@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 16;
 use BTree;
 
 my $btree = BTree->new({-t => 2}); # means `2-3-4 tree`
@@ -43,6 +43,7 @@ is_deeply($btree->keys(), [[1],5,[7,8]]);
 	my $expected_val = [[["A","B"],"C",["D","E","F","H"],"K",["L","M"]],"N",[["P","Q","R"],"S",["T","V"],"W",["X","Y","Z"]]];
 
 	my $btree = BTree->new({-t => 3});
+	# ASCIIコードに変換してinsert
 	my @keys = map ord($_), @values;
 	for (@keys) { $btree->insert($_); }
 	my $got_val = $btree->keys();
@@ -52,7 +53,21 @@ is_deeply($btree->keys(), [[1],5,[7,8]]);
 		my @rt = map { (ref($_) eq "ARRAY") ? deep_map($code,$_) : $code->($_) } @$ary;
 		\@rt;
 	}
+	# 文字に戻してから比較
 	is_deeply(deep_map(sub{chr($_)}, $got_val), $expected_val);
 
 	# test cnt: 1
+
+
+	my ($node, $k);
+	($node, $k) = $btree->search(ord("B"));
+	is($node->{-keys}[$k], ord("B"));
+
+	($node, $k) = $btree->search(ord("Z"));
+	is($node->{-keys}[$k], ord("Z"));
+
+	is($btree->search(ord("J")), undef);
+	is($btree->search(ord("I")), undef);
+
+	# test cnt: 4
 }

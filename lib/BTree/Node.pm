@@ -104,4 +104,21 @@ sub split_child {
 	splice(@{$self->{-keys}}, $i, 0, ($key));
 }
 
+sub search {
+	my ($self, $key) = @_;
+	my $i = 0;
+	while ($i < $self->length() and $self->{-keys}[$i] < $key) {
+		$i++;
+	}
+	if ($i < $self->length() and $self->{-keys}[$i] == $key) {
+		return ($self, $i);
+	}
+	if ($self->is_leaf()) {
+		return undef;
+	} else {
+		return $self->{-children}[$i]->search($key);
+	}
+
+}
+
 1;

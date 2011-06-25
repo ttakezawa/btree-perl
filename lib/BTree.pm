@@ -30,6 +30,11 @@ sub insert {
 	}
 }
 
+sub search {
+	my ($self, $key) = @_;
+	return $self->{-root}->search($key);
+}
+
 sub keys {
 	my ($self) = @_;
 	return $self->{-root}->nested_keys();
